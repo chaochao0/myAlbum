@@ -2,6 +2,7 @@ package com.example.myalbum.ui.dashboard;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.pytorch.IValue;
 //import org.pytorch.LiteModuleLoader;
@@ -200,6 +201,9 @@ public class ImageClassifier {
      */
     public static String predict(Bitmap bitmap, int size){
         Tensor tensor = preprocess(bitmap,size);
+        for(int i =0;i<tensor.shape().length;i++){
+            Log.i("predict shape",String.valueOf(tensor.shape()[i]));
+        }
         IValue inputs = IValue.from(tensor);
         Tensor outputs = model.forward(inputs).toTensor();
         float[] scores = outputs.getDataAsFloatArray();

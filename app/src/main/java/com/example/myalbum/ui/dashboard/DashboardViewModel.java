@@ -1,16 +1,25 @@
 package com.example.myalbum.ui.dashboard;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import com.example.myalbum.GlideEngine;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.SelectMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnResultCallbackListener;
 
 import org.pytorch.IValue;
 //import org.pytorch.LiteModuleLoader;
@@ -20,10 +29,12 @@ import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class DashboardViewModel extends AndroidViewModel {
 
@@ -34,17 +45,20 @@ public class DashboardViewModel extends AndroidViewModel {
         super(application);
 
         AssetManager assetManager = application.getBaseContext().getAssets();
-        System.out.println("111111111");
-        className = new MutableLiveData<>();
-        picture = new MutableLiveData<>();
-        try{
-            picture.setValue(BitmapFactory.decodeStream(assetManager.open("2.jpg")));
+        Log.i("DashboardViewModel","create");
+
+            Log.i("DashboardViewModel","is null");
+            className = new MutableLiveData<>();
+            picture = new MutableLiveData<>();
+            try{
+                picture.setValue(BitmapFactory.decodeStream(assetManager.open("2.jpg")));
 //            module = Module.load(assetFilePath(application,"mobilenetv3_large_161_66acc.pt"));
-        }catch (IOException e) {
-            Log.e("PytorchHelloWorld", "Error reading assets", e);
-        }
+            }catch (IOException e) {
+                Log.e("PytorchHelloWorld", "Error reading assets", e);
+            }
 //        model_eval();
-        className.setValue(ImageClassifier.predict(picture.getValue(),224));
+            className.setValue(ImageClassifier.predict(picture.getValue(),224));
+
     }
 
     public LiveData<String> getClassName() {
@@ -110,4 +124,14 @@ public class DashboardViewModel extends AndroidViewModel {
             return file.getAbsolutePath();
         }
     }
+
+    public void onChoosePicture(String filePath){
+            try{
+                picture.setValue(BitmapFactory.decodeStream(new FileInputStream(filePath)));
+            }catch (IOException e) {
+                Log.e("onChoosePicture", "Error reading file", e);
+            }
+            className.setValue(ImageClassifier.predict(picture.getValue(),224));
+    }
+
 }

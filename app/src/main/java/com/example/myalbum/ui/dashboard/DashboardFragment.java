@@ -1,6 +1,7 @@
 package com.example.myalbum.ui.dashboard;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,24 +12,38 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.myalbum.GlideEngine;
 import com.example.myalbum.databinding.FragmentDashboardBinding;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.SelectMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnResultCallbackListener;
+
+import java.util.ArrayList;
 
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
-
+    static DashboardViewModel dashboardViewModel = null;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        DashboardViewModel dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
+        if(dashboardViewModel == null)
+            dashboardViewModel =
+                    new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         TextView textView = binding.textClass;
         ImageView imageView = binding.image;
-        System.out.println("hahaha");
+        binding.button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                onChoosePicture();
+            }});
+
         dashboardViewModel.getClassName().observe(getViewLifecycleOwner(), textView::setText);
         dashboardViewModel.getPicture().observe(getViewLifecycleOwner(),imageView::setImageBitmap);
+
         return root;
     }
 
@@ -36,5 +51,37 @@ public class DashboardFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public void onChoosePicture() {
+        PictureSelector.create(this)
+                .openGallery(SelectMimeType.ofImage())
+                .setImageEngine(GlideEngine.createGlideEngine())
+                .setMaxSelectNum(1)
+                .forResult(new OnResultCallbackListener<LocalMedia>() {
+                    @Override
+                    public void onResult(ArrayList<LocalMedia> result) {
+                        for (LocalMedia media : result) {
+                            Log.i("onChoosePicture", "是否压缩:" + media.isCompressed());
+                            Log.i("onChoosePicture", "压缩:" + media.getCompressPath());
+                            Log.i("onChoosePicture", "原图:" + media.getPath());
+                            Log.i("onChoosePicture", "原图绝对路径:" + media.getRealPath());
+                            Log.i("onChoosePicture", "是否裁剪:" + media.isCut());
+                            Log.i("onChoosePicture", "裁剪:" + media.getCutPath());
+                            Log.i("onChoosePicture", "是否开启原图:" + media.isOriginal());
+                            Log.i("onChoosePicture", "原图路径:" + media.getOriginalPath());
+//                            Log.i("TAG", "Android Q 特有Path:" + media.getAndroidQToPath());
+//                            BitmapFactory.decodeStream(FileInputStream(media.getPath()))
+//                            FileInputStream stream = new FileInputStream(fileName);
+//                            binding.image.setImageBitmap();
+                            dashboardViewModel.onChoosePicture(media.getRealPath());
+                        }
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.i("onChoosePicture", "PictureSelector Cancel");
+                    }
+                });
     }
 }

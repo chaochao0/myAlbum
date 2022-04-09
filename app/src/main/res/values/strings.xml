@@ -2,5 +2,15 @@
     <string name="app_name">MyAlbum</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+    <string name="button_dashboard">选择图片</string>
+
+
+    <string name="title_notifications">创作</string>
+    <string name="image_1_desc">梵高--星夜</string>
+    <string name="image_2_desc">蒙克--呐喊</string>
+    <string name="image_3_desc">梵高--电动棱镜</string>
+    <string name="title_text">选择一种风格进行创作</string>
+
+
 </resources>
