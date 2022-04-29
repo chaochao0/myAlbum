@@ -1,4 +1,4 @@
-package com.example.myalbum.ui.notifications;
+package com.example.myalbum.model;
 
 import static android.graphics.Color.rgb;
 

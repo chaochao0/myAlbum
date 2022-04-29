@@ -42,7 +42,7 @@ public class NotificationsFragment extends Fragment {
 
         initClickListener();
 
-        ImageView imageView = binding.imageView;
+        ImageView imageView = binding.imageViewTransfer;
         notificationsViewModel.getNewPicture().observe(getViewLifecycleOwner(),imageView::setImageBitmap);
         return root;
     }

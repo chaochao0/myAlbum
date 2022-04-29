@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewTransfer"
         android:layout_width="308dp"
         android:layout_height="271dp"
         android:layout_marginStart="8dp"

@@ -1,4 +1,4 @@
-package com.example.myalbum.ui.dashboard;
+package com.example.myalbum.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImageClassifier {
     //region classNames
@@ -187,9 +189,7 @@ public class ImageClassifier {
     static Module model;
 
     public ImageClassifier(String modelPath){
-        System.out.println("222222222222222222");
         model = Module.load(modelPath);
-        System.out.println("222222222222222222");
     }
 
 
@@ -199,17 +199,33 @@ public class ImageClassifier {
      * @param size 规定传入的图片要符合一个大小标准，这里是224*224
      * @return className
      */
-    public static String predict(Bitmap bitmap, int size){
+    public static List<Object> predict(Bitmap bitmap, int size){
         Tensor tensor = preprocess(bitmap,size);
         for(int i =0;i<tensor.shape().length;i++){
-            Log.i("predict shape",String.valueOf(tensor.shape()[i]));
+            Log.i("predict bitmap shape",String.valueOf(tensor.shape()[i]));
         }
+
         IValue inputs = IValue.from(tensor);
-        Tensor outputs = model.forward(inputs).toTensor();
-        float[] scores = outputs.getDataAsFloatArray();
+        IValue[] outputs = model.forward(inputs).toTuple();
+        Tensor features= outputs[0].toTensor();
+        Tensor pres = outputs[1].toTensor();
+//        Log.i("featureList length",String.valueOf(featureList.length));
+        for(int i =0;i<features.shape().length;i++){
+            Log.i("features shape",String.valueOf(features.shape()[i]));
+        }
+        for(int i =0;i<pres.shape().length;i++){
+            Log.i("pres shape",String.valueOf(pres.shape()[i]));
+        }
+        float[] scores = pres.getDataAsFloatArray();
+//        Tensor outputs = model.forward(inputs).toTensor();
+//        float[] scores = outputs.getDataAsFloatArray();
         int classIndex = argMax(scores);
-        System.out.println(scores[classIndex]);
-        return IMAGE_CLASSES[classIndex];
+        Log.i("pres score",String.valueOf(scores[classIndex]));
+        List<Object> r = new ArrayList<Object>();
+//        r.add(IMAGE_CLASSES[classIndex]);
+        r.add(classIndex);
+        r.add(features.getDataAsFloatArray());
+        return r;
     };
 
     /**

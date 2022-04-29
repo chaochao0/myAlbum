@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">MyAlbum</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_dashboard">分类</string>
+
+    <string name="title_face">人脸</string>
 
     <string name="button_dashboard">选择图片</string>
 
