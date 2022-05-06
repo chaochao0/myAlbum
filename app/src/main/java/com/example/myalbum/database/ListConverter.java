@@ -15,13 +15,11 @@ import java.util.List;
 public class ListConverter {
     @TypeConverter
     public String floatArrayToString(float[] array){
-        Log.i("converter floatArrayToString", GsonInstance.getInstance().getGson().toJson(array));
         return GsonInstance.getInstance().getGson().toJson(array);
     }
     @TypeConverter
     public float[] stringToFloatArray(String json) {
         Type listType = new TypeToken<float[]>(){}.getType();
-       // Log.i("converter stringToFloatList1", GsonInstance.getInstance().getGson().toJson(GsonInstance.getInstance().getGson().fromJson(json,listType)));
         return GsonInstance.getInstance().getGson().fromJson(json,listType);
     }
 //    @TypeConverter
@@ -36,7 +34,6 @@ public class ListConverter {
 //    }
     @TypeConverter
     public String rectListToString(List<Rect> list){
-        Log.i("converter rectListToString", GsonInstance.getInstance().getGson().toJson(list));
         return GsonInstance.getInstance().getGson().toJson(list);
     }
     @TypeConverter
@@ -58,7 +55,6 @@ public class ListConverter {
 
     @TypeConverter
     public String float2ArrayToString(float[][] array2){
-        Log.i("converter float2ArrayToString", GsonInstance.getInstance().getGson().toJson(array2));
         return GsonInstance.getInstance().getGson().toJson(array2);
     }
     @TypeConverter
@@ -69,7 +65,6 @@ public class ListConverter {
 
     @TypeConverter
     public String intArrayToString(int[] array){
-        Log.i("converter intArrayToString", GsonInstance.getInstance().getGson().toJson(array));
         return GsonInstance.getInstance().getGson().toJson(array);
     }
     @TypeConverter
@@ -80,7 +75,6 @@ public class ListConverter {
 
     @TypeConverter
     public String rectToString(Rect rect){
-        Log.i("converter rectToString", GsonInstance.getInstance().getGson().toJson(rect));
         return GsonInstance.getInstance().getGson().toJson(rect);
     }
     @TypeConverter

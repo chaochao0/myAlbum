@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class FaceNet {
-    public static Module model;
+    public static Module model = null;
 
     public static int inputWidth = 160;
     public static int inputHeight = 160;
@@ -38,33 +38,33 @@ public class FaceNet {
     }
 
     public static float [] getFeatureVector(Bitmap bitmap){
-        Log.i("FaceNet getFeatureVector","start");
-        Log.i("FaceNet getFeatureVector","origin bitmap width:"+bitmap.getWidth());
-        Log.i("FaceNet getFeatureVector","origin bitmap height:"+bitmap.getHeight());
+//        Log.i("FaceNet getFeatureVector","start");
+//        Log.i("FaceNet getFeatureVector","origin bitmap width:"+bitmap.getWidth());
+//        Log.i("FaceNet getFeatureVector","origin bitmap height:"+bitmap.getHeight());
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true);
-        Log.i("FaceNet getFeatureVector","scaled bitmap width:"+resizedBitmap.getWidth());
-        Log.i("FaceNet getFeatureVector","scaled bitmap height:"+resizedBitmap.getHeight());
+//        Log.i("FaceNet getFeatureVector","scaled bitmap width:"+resizedBitmap.getWidth());
+//        Log.i("FaceNet getFeatureVector","scaled bitmap height:"+resizedBitmap.getHeight());
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, NO_MEAN_RGB, NO_STD_RGB);
-        for(int i =0;i<inputTensor.shape().length;i++){
-            Log.i("inputTensor shape",String.valueOf(inputTensor.shape()[i]));
-        }
+//        for(int i =0;i<inputTensor.shape().length;i++){
+//            Log.i("inputTensor shape",String.valueOf(inputTensor.shape()[i]));
+//        }
         IValue inputs = IValue.from(inputTensor);
         Tensor outputsTensor = model.forward(inputs).toTensor();
         float[] outputs = outputsTensor.getDataAsFloatArray();
 //        IValue[] outputTuple = model.forward(IValue.from(inputTensor)).toTuple();
-        Log.i("FaceNet getFeatureVector","forward success");
+//        Log.i("FaceNet getFeatureVector","forward success");
 //        final Tensor outputTensor = outputTuple[0].toTensor();
-        for(int i =0;i<outputsTensor.shape().length;i++){
-            Log.i("outputTensor shape",String.valueOf(outputsTensor.shape()[i]));
-        }
-        for(int i =0;i<outputs.length;i++){
-            if(i>=0&&i<=5){
-                Log.i("featurevector first 5",String.valueOf(outputs[i]));
-            }
-            if(i>=outputs.length-5){
-                Log.i("featurevector end 5",String.valueOf(outputs[i]));
-            }
-        }
+//        for(int i =0;i<outputsTensor.shape().length;i++){
+//            Log.i("outputTensor shape",String.valueOf(outputsTensor.shape()[i]));
+//        }
+//        for(int i =0;i<outputs.length;i++){
+//            if(i>=0&&i<=5){
+//                Log.i("featurevector first 5",String.valueOf(outputs[i]));
+//            }
+//            if(i>=outputs.length-5){
+//                Log.i("featurevector end 5",String.valueOf(outputs[i]));
+//            }
+//        }
         return outputs;
     }
 }

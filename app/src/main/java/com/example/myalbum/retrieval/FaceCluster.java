@@ -20,11 +20,11 @@ public class FaceCluster {
 
     static public int[] cid; //cluser class id 聚类结果类别id -1：噪声点  0：初始为0,表示未分类  >0: 聚类后的类别id
 
-    public FaceCluster(float eps_, int minPts_) {
+    public FaceCluster(float eps_, int minPts_,List<Face> faces) {
         eps = eps_;
         minPts = minPts_;
 //        List<Image> images = ImageRepository.mAllImages.getValue();
-        List<Face> faces = ImageRepository.mAllFaces.getValue();
+//        List<Face> faces = ImageRepository.mAllFaces.getValue();
         faceNum = faces.size();
 
         cid = new int[faceNum];

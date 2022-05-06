@@ -32,6 +32,7 @@ public class FaceViewModel extends AndroidViewModel {
 
     public FaceViewModel(@NonNull Application application){
         super(application);
+
         Log.i("FaceViewModel","create");
         picturePath = new MutableLiveData<>();
 //        resultOrigin = new ArrayList<>();

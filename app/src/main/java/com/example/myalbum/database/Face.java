@@ -28,4 +28,13 @@ public class Face {
 
     @ColumnInfo
     public int faceClusterType;  //人脸聚类类别  从1开始
+
+    public void printFaceInfo(){
+        System.out.println("faceId: "+faceId);
+        System.out.println("imageOwnerId: "+imageOwnerId);
+//        System.out.println("path: "+path);
+//        System.out.println("imageFeatures: "+GsonInstance.getInstance().getGson().toJson(imageFeatures));
+//        System.out.println("classIndex: "+classIndex);
+        System.out.println("faceClusterType: "+faceClusterType);
+    }
 }

@@ -19,6 +19,9 @@ public interface FaceDao {
     @Query("SELECT * FROM face")
     LiveData<List<Face>> getFaceList();
 
+    @Query("SELECT * FROM face")
+    List<Face> getFaceListNow();
+
 //    @Query("SELECT * FROM face where imageOwnerId = :image.imageId ")
 //    LiveData<List<Face>> getFaceList(Image image);
 

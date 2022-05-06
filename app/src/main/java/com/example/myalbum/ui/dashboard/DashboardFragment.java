@@ -1,5 +1,7 @@
 package com.example.myalbum.ui.dashboard;
 
+import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,13 +14,17 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.load.resource.gif.GifBitmapProvider;
 import com.example.myalbum.GlideEngine;
 import com.example.myalbum.databinding.FragmentDashboardBinding;
+import com.example.myalbum.model.ImageClassifier;
 import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.config.SelectMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.interfaces.OnResultCallbackListener;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class DashboardFragment extends Fragment {
@@ -28,11 +34,13 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         if(dashboardViewModel == null)
+//            Log.i("dashboardViewModel","111111111");
             dashboardViewModel =
                     new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         TextView textView = binding.textClass;
         ImageView imageView = binding.image;
         binding.button.setOnClickListener(new View.OnClickListener(){
@@ -74,6 +82,7 @@ public class DashboardFragment extends Fragment {
 //                            BitmapFactory.decodeStream(FileInputStream(media.getPath()))
 //                            FileInputStream stream = new FileInputStream(fileName);
 //                            binding.image.setImageBitmap();
+
                             dashboardViewModel.onChoosePicture(media.getRealPath());
                         }
                     }
@@ -84,4 +93,5 @@ public class DashboardFragment extends Fragment {
                     }
                 });
     }
+
 }

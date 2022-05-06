@@ -30,6 +30,9 @@ public interface ImageDao {
     @Query("SELECT * FROM image")
     LiveData<List<Image>> getImageList();
 
+    @Query("SELECT * FROM image")
+    List<Image> getImageListNow();
+
 
     @Query("SELECT * FROM image WHERE path = :path")
     Image getImage(String path);
@@ -40,7 +43,7 @@ public interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<Image> images);
 
-    @Delete
+    @Delete()
     void deleteImage(Image image);
 
     @Delete

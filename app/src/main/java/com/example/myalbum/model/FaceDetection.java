@@ -10,15 +10,20 @@ import org.pytorch.torchvision.TensorImageUtils;
 
 import android.graphics.Rect;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
+import com.example.myalbum.MyApplication;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
 
 ;
 
 public class FaceDetection {
-    public static Module model;
+    public static Module model = null;
     public static String[] mClasses = {"face"};
 
     // model input image size
@@ -42,24 +47,24 @@ public class FaceDetection {
     }
 
     public static ArrayList<Result> detect(Bitmap bitmap,float mImgScaleX, float mImgScaleY, float mIvScaleX, float mIvScaleY, float mStartX, float mStartY){
-        Log.i("FaceDetection detect","start");
-        Log.i("FaceDetection detect","origin bitmap width:"+bitmap.getWidth());
-        Log.i("FaceDetection detect","origin bitmap height:"+bitmap.getHeight());
+//        Log.i("FaceDetection detect","start");
+//        Log.i("FaceDetection detect","origin bitmap width:"+bitmap.getWidth());
+//        Log.i("FaceDetection detect","origin bitmap height:"+bitmap.getHeight());
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, mInputWidth, mInputHeight, true);
-        Log.i("FaceDetection detect","scaled bitmap width:"+resizedBitmap.getWidth());
-        Log.i("FaceDetection detect","scaled bitmap height:"+resizedBitmap.getHeight());
+//        Log.i("FaceDetection detect","scaled bitmap width:"+resizedBitmap.getWidth());
+//        Log.i("FaceDetection detect","scaled bitmap height:"+resizedBitmap.getHeight());
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, NO_MEAN_RGB, NO_STD_RGB);
-        for(int i =0;i<inputTensor.shape().length;i++){
-            Log.i("inputTensor shape",String.valueOf(inputTensor.shape()[i]));
-        }
+//        for(int i =0;i<inputTensor.shape().length;i++){
+//            Log.i("inputTensor shape",String.valueOf(inputTensor.shape()[i]));
+//        }
         IValue[] outputTuple = model.forward(IValue.from(inputTensor)).toTuple();
-        Log.i("FaceDetection detect","forward success");
+//        Log.i("FaceDetection detect","forward success");
         final Tensor outputTensor = outputTuple[0].toTensor();
-        for(int i =0;i<outputTensor.shape().length;i++){
-            Log.i("outputTensor shape",String.valueOf(outputTensor.shape()[i]));
-        }
+//        for(int i =0;i<outputTensor.shape().length;i++){
+//            Log.i("outputTensor shape",String.valueOf(outputTensor.shape()[i]));
+//        }
         final float[] outputs = outputTensor.getDataAsFloatArray();
-        Log.i("outputs length",String.valueOf(outputs.length));
+//        Log.i("outputs length",String.valueOf(outputs.length));
         final ArrayList<Result> results =  outputsToNMSPredictions(outputs, mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY);
 //        Log.i("printResult",results.)
 
@@ -75,6 +80,28 @@ public class FaceDetection {
 //            mResultView.invalidate();
 //            mResultView.setVisibility(View.VISIBLE);
 //        });
+
+    }
+    public static ArrayList<Result> detect(String path,float mImgScaleX, float mImgScaleY){
+        FutureTarget<Bitmap> futureTarget =
+                Glide.with(MyApplication.getContext())
+                        .asBitmap()
+                        .override(mInputWidth,mInputHeight)
+                        .centerCrop()
+                        .load(path)
+                        .submit();
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = futureTarget.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ArrayList<Result> results = detect(bitmap,mImgScaleX,mImgScaleY,1,1,0,0);
+        Glide.with(MyApplication.getContext()).clear(futureTarget);
+        return results;
 
     }
 
@@ -103,7 +130,7 @@ public class FaceDetection {
                     }
                 }
 
-                Rect rect = new Rect((int)(startX+ivScaleX*left), (int)(startY+top*ivScaleY), (int)(startX+ivScaleX*right), (int)(startY+ivScaleY*bottom));
+                Rect rect = new Rect((int)(startX+ivScaleX*left), (int)(startY+top*ivScaleY), (int)(startX+ivScaleX*right), (int)(startY+ivScaleY*bottom)); //左上角点  右下角点
                 Result result = new Result(cls, outputs[i*mOutputColumn+4], rect);
                 results.add(result);
             }

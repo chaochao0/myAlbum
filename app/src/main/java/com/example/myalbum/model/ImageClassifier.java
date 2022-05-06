@@ -2,7 +2,17 @@ package com.example.myalbum.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
+import com.example.myalbum.GlideEngine;
+import com.example.myalbum.MyApplication;
+import com.example.myalbum.database.GsonInstance;
+import com.example.myalbum.ui.dashboard.DashboardFragment;
+import com.google.gson.Gson;
+import com.luck.picture.lib.interfaces.OnCallbackListener;
 
 import org.pytorch.IValue;
 //import org.pytorch.LiteModuleLoader;
@@ -12,12 +22,15 @@ import org.pytorch.Tensor;
 import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class ImageClassifier {
     //region classNames
@@ -186,10 +199,12 @@ public class ImageClassifier {
     };
     //endregion
 
-    static Module model;
+    public static Module model = null;
 
     public ImageClassifier(String modelPath){
+
         model = Module.load(modelPath);
+        Log.i("imageclassifier","created");
     }
 
 
@@ -200,12 +215,66 @@ public class ImageClassifier {
      * @return className
      */
     public static List<Object> predict(Bitmap bitmap, int size){
+//        Log.i("imagePredict","begin");
         Tensor tensor = preprocess(bitmap,size);
-        for(int i =0;i<tensor.shape().length;i++){
-            Log.i("predict bitmap shape",String.valueOf(tensor.shape()[i]));
-        }
+//        for(int i =0;i<tensor.shape().length;i++){
+//            Log.i("predict bitmap shape",String.valueOf(tensor.shape()[i]));
+//        }
 
         IValue inputs = IValue.from(tensor);
+        IValue[] outputs = model.forward(inputs).toTuple();
+        Tensor features= outputs[0].toTensor();
+        Tensor pres = outputs[1].toTensor();
+//        Log.i("featureList length",String.valueOf(featureList.length));
+//        for(int i =0;i<features.shape().length;i++){
+//            Log.i("features shape",String.valueOf(features.shape()[i]));
+//        }
+//        for(int i =0;i<pres.shape().length;i++){
+//            Log.i("pres shape",String.valueOf(pres.shape()[i]));
+//        }
+        float[] scores = pres.getDataAsFloatArray();
+//        Tensor outputs = model.forward(inputs).toTensor();
+//        float[] scores = outputs.getDataAsFloatArray();
+        int classIndex = argMax(scores);
+//        Log.i("pres score",String.valueOf(scores[classIndex]));
+        List<Object> r = new ArrayList<Object>();
+//        r.add(IMAGE_CLASSES[classIndex]);
+        r.add(classIndex);
+        r.add(features.getDataAsFloatArray());
+        return r;
+    };
+
+    //必须在线程中调用
+    public static List<Object> predict(String path){
+        FutureTarget<Bitmap> futureTarget =
+        Glide.with(MyApplication.getContext())
+                .asBitmap()
+                .override(224)
+                .centerCrop()
+                .load(path)
+                .submit();
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = futureTarget.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.i("predict bitmap height",String.valueOf(bitmap.getHeight()));
+        Log.i("predict bitmap width",String.valueOf(bitmap.getWidth()));
+        final Tensor tensor = TensorImageUtils.bitmapToFloat32Tensor(bitmap,
+                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB, MemoryFormat.CHANNELS_LAST);
+        // Do something with the Bitmap and then when you're done with it:
+
+
+        Log.i("tensor shape", GsonInstance.getInstance().getGson().toJson(tensor.shape()));
+
+        IValue inputs = IValue.from(tensor);
+        if(inputs == null){
+            Log.i("isnull","fsdafsaf");
+        }
         IValue[] outputs = model.forward(inputs).toTuple();
         Tensor features= outputs[0].toTensor();
         Tensor pres = outputs[1].toTensor();
@@ -225,9 +294,9 @@ public class ImageClassifier {
 //        r.add(IMAGE_CLASSES[classIndex]);
         r.add(classIndex);
         r.add(features.getDataAsFloatArray());
+        Glide.with(MyApplication.getContext()).clear(futureTarget);
         return r;
     };
-
     /**
      * 对图片进行预处理
      * @param bitmap
@@ -235,6 +304,7 @@ public class ImageClassifier {
      * @return Tensor
      */
     public static Tensor preprocess(Bitmap bitmap,int size){
+
         bitmap = Bitmap.createScaledBitmap(bitmap,size,size,false);
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(bitmap,
                 TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB, MemoryFormat.CHANNELS_LAST);

@@ -12,7 +12,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
+import com.example.myalbum.GlideEngine;
+import com.example.myalbum.MyApplication;
 import com.example.myalbum.model.ImageClassifier;
+import com.luck.picture.lib.interfaces.OnCallbackListener;
 
 import org.pytorch.IValue;
 //import org.pytorch.LiteModuleLoader;
@@ -27,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
 
 public class DashboardViewModel extends AndroidViewModel {
 
@@ -125,6 +131,7 @@ public class DashboardViewModel extends AndroidViewModel {
                 Log.e("onChoosePicture", "Error reading file", e);
             }
             className.setValue(String.valueOf(ImageClassifier.predict(picture.getValue(),224).get(0)));
+
     }
 
 }

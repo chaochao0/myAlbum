@@ -105,6 +105,8 @@ public class NotificationsFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        Log.i("NotificationsFragmentOnDestroyVIew","start");
+
         super.onDestroyView();
         binding = null;
     }

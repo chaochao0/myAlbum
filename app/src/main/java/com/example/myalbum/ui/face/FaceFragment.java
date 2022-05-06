@@ -1,5 +1,6 @@
 package com.example.myalbum.ui.face;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import com.example.myalbum.model.Result;
 import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.config.SelectMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnCallbackListener;
 import com.luck.picture.lib.interfaces.OnResultCallbackListener;
 
 import java.util.ArrayList;
@@ -26,18 +28,20 @@ import java.util.ArrayList;
 public class FaceFragment extends Fragment {
 
     private FaceFragmentBinding binding;
-    private FaceViewModel faceViewModel = null;
+    private static FaceViewModel faceViewModel = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         if(faceViewModel == null)
+//            Log.i("faceViewModel","11111111111");
             faceViewModel =
                     new ViewModelProvider(this).get(FaceViewModel.class);
 
         binding = FaceFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         binding.resultView.setVisibility(View.INVISIBLE);
 
         binding.buttonSelect.setOnClickListener(new View.OnClickListener(){
@@ -79,7 +83,6 @@ public class FaceFragment extends Fragment {
                     @Override
                     public void onResult(ArrayList<LocalMedia> result) {
                         for (LocalMedia media : result) {
-
                             faceViewModel.onChoosePicture(media.getRealPath(),mImageViewWidth,mImageViewHeight);
                         }
                     }
@@ -89,6 +92,13 @@ public class FaceFragment extends Fragment {
                         Log.i("onChoosePicture", "PictureSelector Cancel");
                     }
                 });
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.i("FaceFragmentOnDestroyVIew","start");
+        super.onDestroyView();
+        binding = null;
     }
 
 }

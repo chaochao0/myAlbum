@@ -23,6 +23,9 @@ public class Image {
     public String path;  //照片路径
 
     @ColumnInfo
+    public long date;  //照片时间
+
+    @ColumnInfo
     public int classIndex;  //照片类别
 
     @ColumnInfo
@@ -31,6 +34,14 @@ public class Image {
     @ColumnInfo
     public int faceNum;  //人脸数
 
+    public void printInfo(){
+        System.out.println("imageId"+imageId);
+        System.out.println("date:"+date);
+        System.out.println("path:"+path);
+        System.out.println("imageFeatures："+GsonInstance.getInstance().getGson().toJson(imageFeatures));
+        System.out.println("classIndex:"+classIndex);
+        System.out.println("faceNum:"+faceNum);
+    }
 //    @ColumnInfo
 //    public List<Rect> rects;  //人脸框
 //
