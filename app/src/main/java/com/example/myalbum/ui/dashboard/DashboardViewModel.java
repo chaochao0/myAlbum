@@ -16,6 +16,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.example.myalbum.GlideEngine;
 import com.example.myalbum.MyApplication;
+import com.example.myalbum.database.Image;
+import com.example.myalbum.database.ImageRepository;
 import com.example.myalbum.model.ImageClassifier;
 import com.luck.picture.lib.interfaces.OnCallbackListener;
 
@@ -32,31 +34,34 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class DashboardViewModel extends AndroidViewModel {
 
     private MutableLiveData<String> className;
     private MutableLiveData<Bitmap> picture;
+    private LiveData<List<Image>> mImageList;
     Module module;
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
 
-        AssetManager assetManager = application.getBaseContext().getAssets();
-        Log.i("DashboardViewModel","create");
-
-            Log.i("DashboardViewModel","is null");
-            className = new MutableLiveData<>();
-            picture = new MutableLiveData<>();
-            try{
-                picture.setValue(BitmapFactory.decodeStream(assetManager.open("2.jpg")));
-//            module = Module.load(assetFilePath(application,"mobilenetv3_large_161_66acc.pt"));
-            }catch (IOException e) {
-                Log.e("PytorchHelloWorld", "Error reading assets", e);
-            }
-//        model_eval();
-            className.setValue(String.valueOf(ImageClassifier.predict(picture.getValue(),224).get(0)));
+        mImageList = ImageRepository.getImageRepositoryInstance().getAllImages();
+//        AssetManager assetManager = application.getBaseContext().getAssets();
+//        Log.i("DashboardViewModel","create");
+//
+//            Log.i("DashboardViewModel","is null");
+//            className = new MutableLiveData<>();
+//            picture = new MutableLiveData<>();
+//            try{
+//                picture.setValue(BitmapFactory.decodeStream(assetManager.open("2.jpg")));
+////            module = Module.load(assetFilePath(application,"mobilenetv3_large_161_66acc.pt"));
+//            }catch (IOException e) {
+//                Log.e("PytorchHelloWorld", "Error reading assets", e);
+//            }
+////        model_eval();
+//            className.setValue(String.valueOf(ImageClassifier.predict(picture.getValue(),224).get(0)));
 
     }
 
@@ -66,6 +71,9 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public LiveData<Bitmap> getPicture(){
         return picture;
+    }
+    public LiveData<List<Image>> getImageList() {
+        return mImageList;
     }
 
     public void model_eval(){

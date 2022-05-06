@@ -13,6 +13,10 @@
         <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/fragment_home.xml" value="0.5911282545805208" />
         <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/fragment_notifications.xml" value="0.25" />
         <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/image_view.xml" value="0.22" />
+        <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/view_date.xml" value="0.2796875" />
+        <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/view_image.xml" value="0.2796875" />
+        <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/view_item_image_class.xml" value="0.3333333333333333" />
+        <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/layout/viewitem_classify.xml" value="0.14666666666666667" />
         <entry key="..\:/AndroidProjects/MyAlbum/app/src/main/res/menu/bottom_nav_menu.xml" value="0.3333333333333333" />
       </map>
     </option>

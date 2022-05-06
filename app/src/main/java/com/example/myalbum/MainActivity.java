@@ -3,9 +3,11 @@ package com.example.myalbum;
 import static com.example.myalbum.data.AndroidPhotoScanner.mDefaultFolder;
 import static java.lang.Thread.sleep;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -27,6 +29,7 @@ import com.example.myalbum.model.ImageTransfer;
 
 import androidx.annotation.IdRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -59,6 +62,10 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
 
     private ActivityMainBinding binding;
 
@@ -81,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Log.i("onCreate","MainActivity");
+
+        verifyStoragePermissions(this);//动态申请存储读写权限
 //        isFirstOpen();
 
         context = getApplicationContext();
@@ -173,4 +182,21 @@ public class MainActivity extends AppCompatActivity {
         return context;
     }
 
+    public static void verifyStoragePermissions(Activity activity) {
+        try {
+            //检测是否有写的权限
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // 没有写的权限，去申请写的权限，会弹出对话框
+                Log.i("verifyStoragePermissions","no");
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
+            else{
+                Log.i("verifyStoragePermissions","yes");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -33,6 +33,19 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ImageClassifier {
+    public static String[] FIRST_CLASSES = new String[]{
+            "风景",
+            "地点",
+            "建筑",
+            "交通",
+            "运动",
+            "植物",
+            "活动",
+            "儿童",
+            "美食",
+            "动物",
+            "物品"
+    };
     //region classNames
     public static String[] IMAGE_CLASSES = new String[]{
             "交通/充气艇",

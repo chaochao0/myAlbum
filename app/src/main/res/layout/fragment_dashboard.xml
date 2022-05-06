@@ -6,40 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
-    <TextView
-        android:id="@+id/text_class"
-        android:layout_width="322dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="16dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_classify"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/text_class"-->
+<!--        android:layout_width="322dp"-->
+<!--        android:layout_height="45dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textSize="20sp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.494"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="330dp"
-        android:layout_height="389dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_class"
-        app:layout_constraintVertical_bias="0.32"
-        tools:src="@tools:sample/backgrounds/scenic" />
+<!--    <ImageView-->
+<!--        android:id="@+id/image"-->
+<!--        android:layout_width="330dp"-->
+<!--        android:layout_height="389dp"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/button"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.494"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/text_class"-->
+<!--        app:layout_constraintVertical_bias="0.32"-->
+<!--        tools:src="@tools:sample/backgrounds/scenic" />-->
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
-        android:text="@string/button_dashboard"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+<!--    <Button-->
+<!--        android:id="@+id/button"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="88dp"-->
+<!--        android:text="@string/button_dashboard"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.498"-->
+<!--        app:layout_constraintStart_toStartOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

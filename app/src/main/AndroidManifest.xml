@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myalbum">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -21,14 +22,10 @@
 
     <queries package="${applicationId}">
         <intent>
-            <action android:name="android.media.action.IMAGE_CAPTURE">
-
-            </action>
+            <action android:name="android.media.action.IMAGE_CAPTURE"></action>
         </intent>
         <intent>
-            <action android:name="android.media.action.ACTION_VIDEO_CAPTURE">
-
-            </action>
+            <action android:name="android.media.action.ACTION_VIDEO_CAPTURE"></action>
         </intent>
     </queries>
 
@@ -40,6 +37,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyAlbum">
+        <activity
+            android:name=".SplashActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

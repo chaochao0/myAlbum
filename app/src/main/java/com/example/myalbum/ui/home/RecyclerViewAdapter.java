@@ -16,6 +16,9 @@ import com.example.myalbum.GlideEngine;
 import com.example.myalbum.R;
 import com.example.myalbum.data.PhotoItem;
 import com.example.myalbum.database.Image;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnExternalPreviewEventListener;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     protected static final int DATE = -1;
     protected static final int PHOTO = -2;
 
-    public List<Object> photoWithDayList = new ArrayList<>();
+    public List<Object> photoWithDayList = new ArrayList<>();  //date(String)  PhoteItem
     private Context mContext;
 //    LinkedHashMap<String, List<PhotoItem>> mPhotoWithDay;
 
@@ -54,6 +57,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     if(position != RecyclerView.NO_POSITION)
                     {
                         PhotoItem photo = (PhotoItem) photoWithDayList.get(position);
+                        PictureSelector.create(itemView.getContext())
+                                .openPreview()
+                                .setImageEngine(GlideEngine.createGlideEngine())
+                                .setExternalPreviewEventListener(new OnExternalPreviewEventListener() {
+                                    @Override
+                                    public void onPreviewDelete(int position) {
+
+                                    }
+
+                                    @Override
+                                    public boolean onLongPressDownload(LocalMedia media) {
+                                        return false;
+                                    }
+                                }).startActivityPreview(position, true, "data");
 //                        String url = spacePhoto.getUrl();
 //                        Intent intent = new Intent(mContext, SpacePhotoActivity.class);
 //                        Bundle bundle = new Bundle();

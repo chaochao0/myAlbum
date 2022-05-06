@@ -12,12 +12,20 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider;
 import com.example.myalbum.GlideEngine;
+import com.example.myalbum.data.AndroidPhotoScanner;
+import com.example.myalbum.data.PhotoItem;
+import com.example.myalbum.database.Image;
 import com.example.myalbum.databinding.FragmentDashboardBinding;
 import com.example.myalbum.model.ImageClassifier;
+import com.example.myalbum.ui.home.RecyclerViewAdapter;
+import com.example.myalbum.utils.DateUtil;
 import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.config.SelectMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
@@ -26,7 +34,11 @@ import com.luck.picture.lib.interfaces.OnResultCallbackListener;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
+//分类展示界面
 public class DashboardFragment extends Fragment {
 
     private FragmentDashboardBinding binding;
@@ -40,17 +52,30 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        TextView textView = binding.textClass;
-        ImageView imageView = binding.image;
-        binding.button.setOnClickListener(new View.OnClickListener(){
+        dashboardViewModel.getImageList().observe(getViewLifecycleOwner(), new Observer<List<Image>>() {
             @Override
-            public void onClick(View v){
-                onChoosePicture();
-            }});
+            public void onChanged(List<Image> images) {
+                System.out.println("dashboardViewModelGetImageListOnChanged"+": images length"+images.size());
 
-        dashboardViewModel.getClassName().observe(getViewLifecycleOwner(), textView::setText);
-        dashboardViewModel.getPicture().observe(getViewLifecycleOwner(),imageView::setImageBitmap);
+                RecyclerView recyclerView = binding.rvClassify;
+
+                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
+                recyclerView.setLayoutManager(layoutManager);
+                ClassFolderRecyclerViewAdapter adapter = new ClassFolderRecyclerViewAdapter(getContext(),images);
+                //调用这个函数的时候SpacePhoto并不是空的
+                recyclerView.setAdapter(adapter);
+            }
+        });
+//        TextView textView = binding.textClass;
+//        ImageView imageView = binding.image;
+//        binding.button.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v){
+//                onChoosePicture();
+//            }});
+//
+//        dashboardViewModel.getClassName().observe(getViewLifecycleOwner(), textView::setText);
+//        dashboardViewModel.getPicture().observe(getViewLifecycleOwner(),imageView::setImageBitmap);
 
         return root;
     }
