@@ -3,6 +3,7 @@ package com.example.myalbum.ui.home;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -53,10 +54,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = getBindingAdapterPosition();
-                    if(position != RecyclerView.NO_POSITION)
+                    int position1 = getBindingAdapterPosition();
+                    if(position1 != RecyclerView.NO_POSITION)
                     {
-                        PhotoItem photo = (PhotoItem) photoWithDayList.get(position);
+                        PhotoItem photo = (PhotoItem) photoWithDayList.get(position1);
+                        List<LocalMedia> list=new ArrayList<>();
+
+                        LocalMedia media=new LocalMedia();
+                        String url= photo.getPath();
+                        media.setPath(url);
+                        list.add(media);
+
                         PictureSelector.create(itemView.getContext())
                                 .openPreview()
                                 .setImageEngine(GlideEngine.createGlideEngine())
@@ -70,7 +78,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                                     public boolean onLongPressDownload(LocalMedia media) {
                                         return false;
                                     }
-                                }).startActivityPreview(position, true, "data");
+                                })
+
+                                .startActivityPreview(0, false, (ArrayList<LocalMedia>)list);
 //                        String url = spacePhoto.getUrl();
 //                        Intent intent = new Intent(mContext, SpacePhotoActivity.class);
 //                        Bundle bundle = new Bundle();
@@ -101,6 +111,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public RecyclerViewAdapter(Context context, LinkedHashMap<String, List<PhotoItem>> photoWithDay){
         for(Map.Entry<String, List<PhotoItem>> entry: photoWithDay.entrySet()) {
             photoWithDayList.add(entry.getKey());
+            System.out.println(entry.getKey());
             for(PhotoItem item:entry.getValue()){
                 photoWithDayList.add(item);
             }

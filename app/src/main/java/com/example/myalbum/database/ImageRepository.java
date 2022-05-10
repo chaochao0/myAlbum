@@ -21,11 +21,13 @@ import com.example.myalbum.model.FaceNet;
 import com.example.myalbum.model.ImageClassifier;
 import com.example.myalbum.model.Result;
 import com.example.myalbum.retrieval.FaceCluster;
+import com.example.myalbum.utils.DateUtil;
 import com.example.myalbum.utils.UIUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ImageRepository {
@@ -64,6 +66,13 @@ public class ImageRepository {
     }
 
     private void readFromDatabase() {
+//        MyalbumDatabase.databaseWriteExecutor.execute(() -> {
+//            List<Image> images= mImageDao.getImageListNow();
+//
+//            for(int i=0;i<7;i++){
+//                this.mImageDao.deleteImage(images.get(i));
+//            }
+//        });
 
     }
 
@@ -83,6 +92,12 @@ public class ImageRepository {
     }
 
     public LiveData<List<Face>> getAllFaces(){return mAllFaces;};
+
+    public LiveData<List<ImageWithFaceList>> getAllImageWithFaceList(){
+        return mAllImageWithFaces;
+    }
+
+
 
     public Image getImage(String path){
         if(mAllImages.getValue() == null){

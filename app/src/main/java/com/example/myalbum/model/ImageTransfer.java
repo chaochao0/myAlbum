@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.service.controls.actions.FloatAction;
 import android.util.Log;
 
+import com.example.myalbum.R;
+
 import org.pytorch.IValue;
 import org.pytorch.MemoryFormat;
 import org.pytorch.Module;
@@ -21,15 +23,20 @@ import java.util.Collections;
 
 public class ImageTransfer {
     public static String[] ID_TO_TRANSFER_CLASSES = new String[]{
-           "梵高--星夜", "蒙克--呐喊","索尼娅·德劳内--电动棱镜"
+           "梵高--星夜", "蒙克--呐喊","索尼娅·德劳内--电动棱镜","艺术画--candy","现代画--mosaic","抽象画--rainPrincess","抽象画--udnie"
     };
-    public static ArrayList<String> modelPath;
+    public static int[] drawableId = new int[]{R.drawable.a1, R.drawable.a2, R.drawable.a3, R.drawable.candy, R.drawable.mosaic, R.drawable.rain_princess, R.drawable.udnie};
+    public static String[] assetsModelPath = new String[]{
+            "models/1_transformer.pt", "models/2_transformer.pt","models/3_transformer.pt","models/candy_transformer.pt","models/mosaic_transformer.pt","models/rain_princess_transformer.pt","models/udnie_transformer.pt"
+    };
+    public static ArrayList<String> modelPath = new ArrayList<>();
     //endregion
 
     public static ArrayList<Module> model = new ArrayList<Module>();
 
-    public ImageTransfer(ArrayList<String> modelPath){
+    public ImageTransfer(ArrayList<String> modelPath_){
         Log.i("ImageTransfer","create");
+        modelPath = modelPath_;
         for(String path:modelPath)
             Log.i("ImageTransfer path",path);
         for(String path:modelPath){

@@ -1,9 +1,12 @@
 package com.example.myalbum.ui.face;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,99 +15,133 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.myalbum.MainActivity;
+import com.example.myalbum.database.Face;
+import com.example.myalbum.database.Image;
+import com.example.myalbum.database.ImageRepository;
+import com.example.myalbum.database.ImageWithFaceList;
 import com.example.myalbum.model.FaceDetection;
 import com.example.myalbum.model.FaceNet;
 import com.example.myalbum.model.Result;
+import com.example.myalbum.retrieval.ImageRetrieval;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FaceViewModel extends AndroidViewModel {
     // TODO: Implement the ViewModel
-    private MutableLiveData<String> picturePath;
-    private MutableLiveData<Bitmap> bitmap;
+//    private MutableLiveData<String> picturePath;
+//    private MutableLiveData<Bitmap> bitmap;
+//    private MutableLiveData<ArrayList<Result>> resultList;
 
-//    private ArrayList<Result> resultOrigin;  //result的原始保存地址，每次获得结果后重新new并赋值，然后让resultList指向它
-    private MutableLiveData<ArrayList<Result>> resultList;
-
+    private LiveData<List<ImageWithFaceList>> mAllImageWithFaces;
+    private MutableLiveData<List<Image>> retrievalResult;
 
     public FaceViewModel(@NonNull Application application){
         super(application);
-
-        Log.i("FaceViewModel","create");
-        picturePath = new MutableLiveData<>();
-//        resultOrigin = new ArrayList<>();
-        resultList = new MutableLiveData<>();
-        AssetManager assetManager = application.getBaseContext().getAssets();
-        bitmap = new MutableLiveData<>();
-        try{
-            bitmap.setValue(BitmapFactory.decodeStream(assetManager.open("faceTest.jpg")));
-        }catch (IOException e) {
-            Log.e("FaceViewModel create", "Error reading assets", e);
-        }
+        retrievalResult = new MutableLiveData<>();
+        mAllImageWithFaces = ImageRepository.getImageRepositoryInstance().getAllImageWithFaceList();
+//        Log.i("FaceViewModel","create");
+//        picturePath = new MutableLiveData<>();
+////        resultOrigin = new ArrayList<>();
+//        resultList = new MutableLiveData<>();
+//        AssetManager assetManager = application.getBaseContext().getAssets();
+//        bitmap = new MutableLiveData<>();
+//        try{
+//            bitmap.setValue(BitmapFactory.decodeStream(assetManager.open("faceTest.jpg")));
+//        }catch (IOException e) {
+//            Log.e("FaceViewModel create", "Error reading assets", e);
+//        }
     }
 
-    public LiveData<String> getPicturePath(){
-        return picturePath;
-    }
-
-    public LiveData<Bitmap> getBitmap(){
-        return bitmap;
-    }
-
-//    public void postResults(ArrayList<Result> results){
-//        resultOrigin = new ArrayList<Result>(results);
-//
-//        resultList.postValue(resultOrigin);
-//
+//    public LiveData<String> getPicturePath(){
+//        return picturePath;
 //    }
+//
+//    public LiveData<Bitmap> getBitmap(){
+//        return bitmap;
+//    }
+    public LiveData<List<Image>> getRetrievalResult(){
+        return retrievalResult;
+    }
 
-    public LiveData<ArrayList<Result>> getResultList(){
-        return resultList;
+    public LiveData<List<ImageWithFaceList>> getAllImageWithFaces(){
+        return mAllImageWithFaces;
     }
 
 
-    public void onChoosePicture(String realPath, float mImageViewWidth, float mImageViewHeight) {
+
+
+
+    public void onChoosePicture(String realPath) {
+        Bitmap bitmap = null;
         try {
-            bitmap.setValue(BitmapFactory.decodeStream(new FileInputStream(realPath)));
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(realPath));
         } catch (FileNotFoundException e) {
             Log.e("FaceViewModel onChoosePicture", "Error reading file", e);
         }
-        Bitmap mBitmap = bitmap.getValue();
+
+        Bitmap finalBitmap = bitmap;
         MainActivity.executorService.execute(new Runnable() {
              @Override
              public void run() {
                  String threadName = Thread.currentThread().getName();
                  Log.e("FaceViewModel run model", "线程：" + threadName+" begin");
+                 //人脸检测
+                 List<Face> faceList = new ArrayList<>();
 
-                 float mImgScaleX = (float)mBitmap.getWidth() / FaceDetection.mInputWidth;
-                 float mImgScaleY = (float)mBitmap.getHeight() / FaceDetection.mInputHeight;
+                 float mImgScaleX = (float) finalBitmap.getWidth() / FaceDetection.mInputWidth;
+                 float mImgScaleY = (float) finalBitmap.getHeight() / FaceDetection.mInputHeight;
 
-//                 float mIvScaleX = 1;//(mBitmap.getWidth() > mBitmap.getHeight() ? mImageViewWidth / mBitmap.getWidth() : mImageViewHeight / mBitmap.getHeight());
-//                 float mIvScaleY  = 1;//(mBitmap.getHeight() > mBitmap.getWidth() ? mImageViewHeight / mBitmap.getHeight() : mImageViewWidth / mBitmap.getWidth());
-//
-//                 float mStartX = 0;// (mImageViewWidth - mIvScaleX * mBitmap.getWidth())/2;
-//                 float mStartY = 0;//(mImageViewHeight -  mIvScaleY * mBitmap.getHeight())/2;
-                 float mIvScaleX = (mBitmap.getWidth() > mBitmap.getHeight() ? mImageViewWidth / mBitmap.getWidth() : mImageViewHeight / mBitmap.getHeight());
-                 float mIvScaleY  = (mBitmap.getHeight() > mBitmap.getWidth() ? mImageViewHeight / mBitmap.getHeight() : mImageViewWidth / mBitmap.getWidth());
 
-                 float mStartX = (mImageViewWidth - mIvScaleX * mBitmap.getWidth())/2;
-                 float mStartY = (mImageViewHeight -  mIvScaleY * mBitmap.getHeight())/2;
+                 ArrayList<Result> detectResult = FaceDetection.detect(finalBitmap,mImgScaleX,mImgScaleY,1,1,0,0);
+                 List<Rect> rects = new ArrayList<>();
 
-                 ArrayList<com.example.myalbum.model.Result> results = FaceDetection.detect(mBitmap,mImgScaleX,mImgScaleY,mIvScaleX,mIvScaleY,mStartX,mStartY);
-//                 int x = results.get(0).rect.left;
-//                 int y = results.get(0).rect.top;
-//                 int width = results.get(0).rect.right - x;
-//                 int height =  results.get(0).rect.bottom-y;
-//                 Bitmap bitmapFace = Bitmap.createBitmap(bitmap.getValue(),x,y,width,height);
-//                 bitmap.postValue(bitmapFace);
-//                 float[] featureVector =  FaceNet.getFeatureVector(bitmapFace);
 
-                 resultList.postValue(results);
+                 for(Result b:detectResult){
+                     Rect a = b.rect;
+                     int x = a.left > 0 ? a.left : 0;
+                     a.left =x;
+                     int y = a.top > 0 ? a.top : 0;
+                     a.top =y;
+                     int width = (a.right > finalBitmap.getWidth() ? finalBitmap.getWidth() : a.right) - x;
+                     a.right = a.left+width;
+                     int height = (a.bottom > finalBitmap.getHeight() ? finalBitmap.getHeight() : a.bottom) - y;
+                     a.bottom = a.top+height;
+                     if(width*height>22500&&b.score>=0.31&& (float)(width)/(float)height<1.45&&(float)height/(float)width<1.45){
+                         rects.add(a);
+                     }
+                 }
+
+                 for(Rect a:rects){
+                     int x = a.left > 0 ? a.left : 0;
+                     int y = a.top > 0 ? a.top : 0;
+                     int width = (a.right > finalBitmap.getWidth() ? finalBitmap.getWidth() : a.right) - x;
+                     int height =  (a.bottom > finalBitmap.getHeight() ? finalBitmap.getHeight() : a.bottom) - y;
+                     Bitmap bitmapFace = Bitmap.createBitmap(finalBitmap,x,y,width,height);
+                     float [] faceFeatures = FaceNet.getFeatureVector(bitmapFace);
+                     Face face = new Face();
+                     face.faceFeatures = faceFeatures;
+                     face.rect = a;
+                     faceList.add(face);
+                 }
+                 List<Image> result = new ArrayList<>();
+                 if(faceList.size()<=0){
+                    retrievalResult.postValue(result);
+                 }
+                 else{
+                     result = ImageRetrieval.query(faceList,10);
+                     retrievalResult.postValue(result);
+                 }
              }
-        });
 
+
+        });
+    }
+
+    public void clearRetrievalResult() {
+        retrievalResult.setValue(null);
     }
 }

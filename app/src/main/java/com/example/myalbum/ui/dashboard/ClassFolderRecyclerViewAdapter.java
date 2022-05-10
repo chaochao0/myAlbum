@@ -1,6 +1,9 @@
 package com.example.myalbum.ui.dashboard;
 
+
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +17,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myalbum.GlideEngine;
 import com.example.myalbum.R;
 import com.example.myalbum.data.PhotoItem;
+import com.example.myalbum.database.GsonInstance;
 import com.example.myalbum.database.Image;
 import com.example.myalbum.model.ImageClassifier;
+import com.example.myalbum.ui.GallaryActivity;
 import com.example.myalbum.ui.home.RecyclerViewAdapter;
+import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.config.SelectMimeType;
+import com.stfalcon.imageviewer.StfalconImageViewer;
+import com.stfalcon.imageviewer.loader.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,6 +67,29 @@ public class ClassFolderRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
                     int position = getBindingAdapterPosition();
                     if(position != RecyclerView.NO_POSITION)
                     {
+                        ClassFolder folder = (ClassFolder) ClassFolderList.get(position);
+                        List<Image> imageList = folder.mImagelist;
+                        Intent intent = new Intent(v.getContext(), GallaryActivity.class);
+                        intent.putExtra("imageList", GsonInstance.getInstance().getGson().toJson(imageList));
+                        intent.putExtra("className", folder.secondClassName);
+
+                        v.getContext().startActivity(intent);
+
+//                        List<String> images = new ArrayList<>();
+//                        for(Image i:imageList){
+//                            images.add(i.path);
+//                        }
+//                        new StfalconImageViewer.Builder<String>(v.getContext(), images, new ImageLoader<String>() {
+//                            @Override
+//                            public void loadImage(ImageView imageView, String image) {
+//                                GlideEngine.createGlideEngine().loadImage(v.getContext(), image,imageView);
+//                            }
+//                        }).show();
+//                        StfalconImageViewer.Builder<Image>(itemView.getContext(), images, ( ImageView view, Image image -> {
+//                        return GlideEngine.createGlideEngine().loadImage(itemView.getContext(), image.path,view); })).show()
+
+
+
 //                        PhotoItem photo = (PhotoItem) photoWithDayList.get(position);
 //                        String url = spacePhoto.getUrl();
 //                        Intent intent = new Intent(mContext, SpacePhotoActivity.class);
@@ -72,29 +105,20 @@ public class ClassFolderRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     }
 
 
-
-//    static class ViewHolder extends RecyclerView.ViewHolder{
-//        ImageView mImage;
-//        TextView mText;
-//        public ViewHolder(View view){
-//            super(view);
-//            mImage = (ImageView) view.findViewById(R.id.image);
-//            mText = (TextView) view.findViewById(R.id.date);
-//
-//
-//        }
-//    }
-
     public ClassFolderRecyclerViewAdapter(Context context, List<Image> imageList){
         LinkedHashMap<String,ClassFolder> classToFolder = new LinkedHashMap<>();
         for(Image image:imageList){
-            if(!classToFolder.containsKey(ImageClassifier.IMAGE_CLASSES[image.classIndex])) {
-                ClassFolder folder = new ClassFolder(image);
-                classToFolder.put(ImageClassifier.IMAGE_CLASSES[image.classIndex],folder);
-            } else {
-                ClassFolder folder = classToFolder.get(ImageClassifier.IMAGE_CLASSES[image.classIndex]);
-                folder.add(image);
+            if(image.classIndex != -1)
+            {
+                if(!classToFolder.containsKey(ImageClassifier.IMAGE_CLASSES[image.classIndex])) {
+                    ClassFolder folder = new ClassFolder(image);
+                    classToFolder.put(ImageClassifier.IMAGE_CLASSES[image.classIndex],folder);
+                } else {
+                    ClassFolder folder = classToFolder.get(ImageClassifier.IMAGE_CLASSES[image.classIndex]);
+                    folder.add(image);
+                }
             }
+
         }
         for(String firstClass: ImageClassifier.FIRST_CLASSES){
             ClassFolderList.add(firstClass);
@@ -133,10 +157,12 @@ public class ClassFolderRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
             ((ClassFolderRecyclerViewAdapter.HeadingHolder) holder).textView.setText((String)ClassFolderList.get(position));
         }
         else if(holder instanceof ClassFolderRecyclerViewAdapter.ClassFolderHolder){
+            long startTime = System.currentTimeMillis();
 //            GlideEngine.createGlideEngine().loadImage(mContext,((PhotoItem)photoWithDayList.get(position)).getPath(),((PhotoHolder) holder).imageView);
             GlideEngine.createGlideEngine().loadGridImage(mContext,((ClassFolder)ClassFolderList.get(position)).firstImagePath,((ClassFolderRecyclerViewAdapter.ClassFolderHolder) holder).imageView);
             ((ClassFolderRecyclerViewAdapter.ClassFolderHolder) holder).classNameTextView.setText(((ClassFolder) ClassFolderList.get(position)).secondClassName);
-
+            long endTime = System.currentTimeMillis();
+            System.out.println("classonBindViewHolder一次运行时间"+(endTime-startTime));
             //            ((PhotoHolder) holder).imageView.setImageResource((int)photoWithDayList.get(position));
         }
     }

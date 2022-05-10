@@ -27,10 +27,10 @@ public interface ImageDao {
 //    @Query("SELECT * FROM image where imageId = :imageId_")
 //    public ImageWithFaceList getImageWithFaceList(int imageId_);
 
-    @Query("SELECT * FROM image")
+    @Query("SELECT * FROM image order by date DESC")
     LiveData<List<Image>> getImageList();
 
-    @Query("SELECT * FROM image")
+    @Query("SELECT * FROM image order by date DESC")
     List<Image> getImageListNow();
 
 

@@ -15,10 +15,12 @@ import androidx.lifecycle.MutableLiveData;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
 import com.example.myalbum.GlideEngine;
+import com.example.myalbum.MainActivity;
 import com.example.myalbum.MyApplication;
 import com.example.myalbum.database.Image;
 import com.example.myalbum.database.ImageRepository;
 import com.example.myalbum.model.ImageClassifier;
+import com.example.myalbum.retrieval.ImageRetrieval;
 import com.luck.picture.lib.interfaces.OnCallbackListener;
 
 import org.pytorch.IValue;
@@ -42,11 +44,15 @@ public class DashboardViewModel extends AndroidViewModel {
     private MutableLiveData<String> className;
     private MutableLiveData<Bitmap> picture;
     private LiveData<List<Image>> mImageList;
+
+    private MutableLiveData<List<Image>> retrievalResult;
     Module module;
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
-
+        picture = new MutableLiveData<>();
+        className= new MutableLiveData<>();
+        retrievalResult = new MutableLiveData<>();
         mImageList = ImageRepository.getImageRepositoryInstance().getAllImages();
 //        AssetManager assetManager = application.getBaseContext().getAssets();
 //        Log.i("DashboardViewModel","create");
@@ -74,6 +80,9 @@ public class DashboardViewModel extends AndroidViewModel {
     }
     public LiveData<List<Image>> getImageList() {
         return mImageList;
+    }
+    public LiveData<List<Image>> getRetrievalResult() {
+        return retrievalResult;
     }
 
     public void model_eval(){
@@ -133,13 +142,29 @@ public class DashboardViewModel extends AndroidViewModel {
     }
 
     public void onChoosePicture(String filePath){
-            try{
-                picture.setValue(BitmapFactory.decodeStream(new FileInputStream(filePath)));
-            }catch (IOException e) {
-                Log.e("onChoosePicture", "Error reading file", e);
+        MainActivity.executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = null;
+                try{
+                    bitmap = BitmapFactory.decodeStream(new FileInputStream(filePath));
+                }catch (IOException e) {
+                    Log.e("onChoosePicture", "Error reading file", e);
+                }
+//                className.postValue(String.valueOf(ImageClassifier.predict(bitmap,224).get(0)));
+                float[] features = (float[])ImageClassifier.predict(bitmap,224).get(1);
+                Image image = new Image();
+                image.path = filePath;
+                image.imageFeatures = features;
+                List<Image> result = ImageRetrieval.query(image,10);
+                retrievalResult.postValue(result);
             }
-            className.setValue(String.valueOf(ImageClassifier.predict(picture.getValue(),224).get(0)));
+        });
 
+
+    }
+    public void clearRetrievalResult() {
+        retrievalResult.setValue(null);
     }
 
 }

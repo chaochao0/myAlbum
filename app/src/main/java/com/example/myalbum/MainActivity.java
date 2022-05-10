@@ -13,6 +13,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Toast;
 
 import com.example.myalbum.data.AndroidPhotoScanner;
@@ -131,13 +133,15 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
     public void initModel(){
         ArrayList<String> transferList= new ArrayList<String>();
 //        String[] modelPath = {"1_transformer.pt", "2_transformer.pt", "3_transformer.pt"};
-        String[] modelPath = {"models/1_transformer.pt", "models/2_transformer.pt"};
+        String[] modelPath = ImageTransfer.assetsModelPath;
         String classiferModel="";
         String faceDetectionModel = "";
         String faceNetModel = "";
@@ -198,5 +202,11 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.title_with_button, menu);
+        return true;
     }
 }

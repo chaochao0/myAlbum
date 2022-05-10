@@ -1,10 +1,17 @@
 package com.example.myalbum.ui.dashboard;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,24 +26,35 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.resource.gif.GifBitmapProvider;
 import com.example.myalbum.GlideEngine;
+import com.example.myalbum.R;
 import com.example.myalbum.data.AndroidPhotoScanner;
 import com.example.myalbum.data.PhotoItem;
+import com.example.myalbum.database.GsonInstance;
 import com.example.myalbum.database.Image;
 import com.example.myalbum.databinding.FragmentDashboardBinding;
+import com.example.myalbum.databinding.FragmentHomeBinding;
 import com.example.myalbum.model.ImageClassifier;
+import com.example.myalbum.ui.GallaryActivity;
+import com.example.myalbum.ui.home.HomeFragment;
 import com.example.myalbum.ui.home.RecyclerViewAdapter;
 import com.example.myalbum.utils.DateUtil;
+import com.luck.lib.camerax.utils.DateUtils;
 import com.luck.picture.lib.basic.PictureSelector;
+import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.config.SelectMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.interfaces.OnMediaEditInterceptListener;
 import com.luck.picture.lib.interfaces.OnResultCallbackListener;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.zip.Inflater;
 
 //分类展示界面
 public class DashboardFragment extends Fragment {
@@ -51,7 +69,11 @@ public class DashboardFragment extends Fragment {
                     new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
+
         View root = binding.getRoot();
+        setHasOptionsMenu(true);
+
+
         dashboardViewModel.getImageList().observe(getViewLifecycleOwner(), new Observer<List<Image>>() {
             @Override
             public void onChanged(List<Image> images) {
@@ -64,6 +86,21 @@ public class DashboardFragment extends Fragment {
                 ClassFolderRecyclerViewAdapter adapter = new ClassFolderRecyclerViewAdapter(getContext(),images);
                 //调用这个函数的时候SpacePhoto并不是空的
                 recyclerView.setAdapter(adapter);
+            }
+        });
+        dashboardViewModel.getRetrievalResult().observe(getViewLifecycleOwner(), new Observer<List<Image>>() {
+            @Override
+            public void onChanged(List<Image> images) {
+                if(images == null){
+                    return;
+                }
+
+                Intent intent = new Intent(getContext(), GallaryActivity.class);
+                intent.putExtra("imageList", GsonInstance.getInstance().getGson().toJson(images));
+                intent.putExtra("className", "照片查询结果");
+
+                getContext().startActivity(intent);
+                dashboardViewModel.clearRetrievalResult();
             }
         });
 //        TextView textView = binding.textClass;
@@ -79,6 +116,47 @@ public class DashboardFragment extends Fragment {
 
         return root;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        super.onCreateOptionsMenu(menu,inflater);
+//        MenuInflater inflater =getActivity().getMenuInflater();
+//
+//        inflater.inflate(R.menu.title_with_button, menu);
+        menu.getItem(0).setTitle("搜图");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.action_cart://监听菜单按钮
+                System.out.println("查相似图点击事件");
+
+                PictureSelector.create(getContext())
+                        .openGallery(SelectMimeType.ofImage())
+                        .setImageEngine(GlideEngine.createGlideEngine())
+                        .setMaxSelectNum(1)
+                        .forResult(new OnResultCallbackListener<LocalMedia>() {
+                            @Override
+                            public void onResult(ArrayList<LocalMedia> result) {
+                                for (LocalMedia media : result) {
+
+                                    dashboardViewModel.onChoosePicture(media.getRealPath());
+                                }
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                Log.i("getResultFromPictureSelector", "PictureSelector Cancel");
+                            }
+                        });
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     @Override
     public void onDestroyView() {

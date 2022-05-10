@@ -26,7 +26,7 @@ public class Image {
     public long date;  //照片时间
 
     @ColumnInfo
-    public int classIndex;  //照片类别
+    public int classIndex;  //照片类别   -1：不进行分类
 
     @ColumnInfo
     public float[] imageFeatures;  //照片的特征向量

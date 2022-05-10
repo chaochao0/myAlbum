@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,10 +22,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myalbum.MainActivity;
+import com.example.myalbum.R;
 import com.example.myalbum.data.AndroidPhotoScanner;
 import com.example.myalbum.data.PhotoItem;
 import com.example.myalbum.database.GsonInstance;
 import com.example.myalbum.database.Image;
+import com.example.myalbum.database.ImageRepository;
 import com.example.myalbum.databinding.FragmentHomeBinding;
 import com.example.myalbum.ui.face.FaceViewModel;
 import com.example.myalbum.utils.DateUtil;
@@ -45,6 +50,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        setHasOptionsMenu(true);
 
 
 //        //监听RecyclerView滚动状态
@@ -76,9 +82,18 @@ public class HomeFragment extends Fragment {
             public void onChanged(List<Image> images) {
                 System.out.println("homeViewModelGetImageListOnChanged"+": images length"+images.size());
                 LinkedHashMap<String, List<PhotoItem>> mSectionsOfDay = new LinkedHashMap<>();
-//                for(Image image:images){
-//                    image.printInfo();
-//                }
+                images.get(images.size()-1).printInfo();
+//                Date date = new Date(images.get(images.size()-1).getModified() * 1000);
+//                String detail = AndroidPhotoScanner.mDataFormatOfDay.format(date);
+//                String week = DateUtil.getWeek(date);
+//                String dayKey = detail + week;
+                int i =0;
+                for(Image image:images){
+                    i++;
+                    if(i>5)
+                        break;
+                        image.printInfo();
+                }
                 for(Image image:images){
                     PhotoItem photo = new PhotoItem(image.path,image.date);
 
@@ -113,10 +128,32 @@ public class HomeFragment extends Fragment {
         });
 
 
+
 //        final TextView textView = binding.textHome;
 //        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        super.onCreateOptionsMenu(menu,inflater);
+//        MenuInflater inflater =getActivity().getMenuInflater();
+//
+//        inflater.inflate(R.menu.title_with_button, menu);
+        menu.getItem(0).setTitle("扫描");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.action_cart://监听菜单按钮
+                System.out.println("扫描点击事件");
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onDestroyView() {

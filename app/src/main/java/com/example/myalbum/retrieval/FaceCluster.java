@@ -96,7 +96,7 @@ public class FaceCluster {
 
     }
 
-    public float ComputeDistance(double[] a, double[] b) {
+    public static float ComputeDistance(double[] a, double[] b) {
         float sum = 0.0f;
         for (int i = 0; i < a.length; i++) {
             sum += Math.pow((a[i] - b[i]), 2);
@@ -105,7 +105,7 @@ public class FaceCluster {
         return dist;
     }
 
-    public float ComputeDistance(float[] a, float[] b) {
+    public static float ComputeDistance(float[] a, float[] b) {
         float sum = 0.0f;
         for (int i = 0; i < a.length; i++) {
             sum += Math.pow((a[i] - b[i]), 2);

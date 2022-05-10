@@ -51,7 +51,7 @@ public class AndroidPhotoScanner {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
-            collection = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         }
         //readSystemGallery(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         readSystemGallery(collection);

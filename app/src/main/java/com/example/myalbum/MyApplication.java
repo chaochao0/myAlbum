@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.hjq.bar.ITitleBarStyle;
+import com.hjq.bar.TitleBar;
+
 public class MyApplication extends Application {
 
     private static Context mContext;
