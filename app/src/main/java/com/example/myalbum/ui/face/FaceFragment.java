@@ -75,7 +75,7 @@ public class FaceFragment extends Fragment {
                     }
                 }
                 System.out.println("faceViewModelGetAllImageWithFaces"+": faceNum length"+faceNum);
-                imageWithFaceLists.get(0).faceList.get(0).printFaceInfo();
+//                imageWithFaceLists.get(0).faceList.get(0).printFaceInfo();
                 RecyclerView recyclerView = binding.rvFace;
 
                 RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 4);

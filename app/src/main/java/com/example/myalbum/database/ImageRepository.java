@@ -58,7 +58,7 @@ public class ImageRepository {
         mAllImageWithFaces = mImageDao.getImageWithFaceList();
         if(MyApplication.isFirstOpen){
             Log.i("ImageRepositoryCreateIsFirstOpen","is firstopen");
-            initMydatabase();
+//            initMydatabase();
         }
         else{
             Log.i("ImageRepositoryCreateIsNotFirstOpen ","is not firstopen");

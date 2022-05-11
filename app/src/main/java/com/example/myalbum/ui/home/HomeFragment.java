@@ -85,7 +85,7 @@ public class HomeFragment extends Fragment {
             public void onChanged(List<Image> images) {
                 System.out.println("homeViewModelGetImageListOnChanged"+": images length"+images.size());
                 LinkedHashMap<String, List<PhotoItem>> mSectionsOfDay = new LinkedHashMap<>();
-                images.get(0).printInfo();
+//                images.get(0).printInfo();
 ////                Date date = new Date(images.get(images.size()-1).getModified() * 1000);
 ////                String detail = AndroidPhotoScanner.mDataFormatOfDay.format(date);
 ////                String week = DateUtil.getWeek(date);

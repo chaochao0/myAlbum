@@ -30,6 +30,7 @@ public class MyApplication extends Application {
         if(isFirstStart) {
             //代表第一次启动App
             SharedPreferences.Editor editor = base.edit();
+
             editor.putBoolean("isFirstStart",false);
             editor.commit();
             Toast.makeText(this,"第一次",Toast.LENGTH_LONG).show();
