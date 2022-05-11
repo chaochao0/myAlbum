@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -21,6 +22,7 @@ import com.example.myalbum.model.FaceNet;
 import com.example.myalbum.model.ImageClassifier;
 import com.example.myalbum.model.Result;
 import com.example.myalbum.retrieval.FaceCluster;
+import com.example.myalbum.ui.home.HomeFragment;
 import com.example.myalbum.utils.DateUtil;
 import com.example.myalbum.utils.UIUtils;
 
@@ -164,18 +166,31 @@ public class ImageRepository {
         });
 
     }
-
-    public void insertImageWithFaceList(Image image, List<Face> faces){
-        for(Face f:faces){
-            f.imageOwnerId = image.imageId;
-        }
+    public void deleteImageWithFaceList(List<ImageWithFaceList> imageWithFaceList){
         MyalbumDatabase.databaseWriteExecutor.execute(() -> {
-            mImageDao.insert(image);
-            mFaceDao.insert(faces);
+            for(ImageWithFaceList i:imageWithFaceList){
+                mImageDao.deleteImage(i.image);
+                mFaceDao.deleteFace(i.faceList);
+            }
         });
-        ImageNum+=1;
-        FaceNum+=faces.size();
+
     }
+    public void insertImageWithFaceList(List<ImageWithFaceList> imageWithFaceList){
+        MyalbumDatabase.databaseWriteExecutor.execute(() -> {
+            for(ImageWithFaceList i:imageWithFaceList){
+
+                long imagid = mImageDao.insert(i.image);
+                for(Face f:i.faceList){
+                    f.imageOwnerId = (int)imagid;
+                }
+                mFaceDao.insert(i.faceList);
+                System.out.println("hlhafk"+imagid);
+            }
+
+        });
+
+    }
+
 
     public void updateImage(Image image){
         MyalbumDatabase.databaseWriteExecutor.execute(() -> {
@@ -198,7 +213,7 @@ public class ImageRepository {
 //    }
 
     //输入到图片分类模型 人脸检测模型 人脸特征提取模型
-    private void initMydatabase(){
+    public void initMydatabase(){
         MyalbumDatabase.databaseWriteExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -322,4 +337,177 @@ public class ImageRepository {
         });
     }
 
+
+    private ImageWithFaceList getNewImageAndFaces(PhotoItem photo){
+        Image image = new Image();
+        image.path = photo.getPath();
+        image.date = photo.getModified();
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(photo.getPath()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //分类模型
+        List<Object> predictResult = ImageClassifier.predict(bitmap,224);
+
+        image.classIndex =(int)predictResult.get(0);
+        image.imageFeatures = (float[]) predictResult.get(1);
+        Log.i("initMydatabase classIndex",String.valueOf(image.classIndex));
+
+        //人脸检测
+        List<Face> faceList = new ArrayList<>();
+
+        float mImgScaleX = (float)photo.getImageWidth() / FaceDetection.mInputWidth;
+        float mImgScaleY = (float)photo.getImageHeight() / FaceDetection.mInputHeight;
+
+
+        ArrayList<Result> detectResult = FaceDetection.detect(bitmap,mImgScaleX,mImgScaleY,1,1,0,0);
+        List<Rect> rects = new ArrayList<>();
+
+
+        for(Result b:detectResult){
+            Rect a = b.rect;
+            int x = a.left > 0 ? a.left : 0;
+            a.left =x;
+            int y = a.top > 0 ? a.top : 0;
+            a.top =y;
+            int width = (a.right > photo.getImageWidth() ? photo.getImageWidth() : a.right) - x;
+            a.right = a.left+width;
+            int height = (a.bottom > photo.getImageHeight() ? photo.getImageHeight() : a.bottom) - y;
+            a.bottom = a.top+height;
+            if(width*height>22500&&b.score>=0.31&& (float)(width)/(float)height<1.45&&(float)height/(float)width<1.45){
+                rects.add(a);
+            }
+        }
+
+        image.faceNum = rects.size();
+
+        for(Rect a:rects){
+            int x = a.left > 0 ? a.left : 0;
+            int y = a.top > 0 ? a.top : 0;
+            int width = (a.right > photo.getImageWidth() ? photo.getImageWidth() : a.right) - x;
+            int height =  (a.bottom > photo.getImageHeight() ? photo.getImageHeight() : a.bottom) - y;
+            Bitmap bitmapFace = Bitmap.createBitmap(bitmap,x,y,width,height);
+            float [] faceFeatures = FaceNet.getFeatureVector(bitmapFace);
+            Face face = new Face();
+            face.faceFeatures = faceFeatures;
+            face.rect = a;
+            face.imageOwnerId = image.imageId;
+            faceList.add(face);
+        }
+        ImageWithFaceList result = new ImageWithFaceList();
+        result.image = image;
+        result.faceList = faceList;
+        return result;
+    }
+
+    public void restartScanPhoto(){
+        MyalbumDatabase.databaseWriteExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                String threadName = Thread.currentThread().getName();
+                Log.i("restartScanPhoto", "线程：" + threadName);
+                long startTime = System.currentTimeMillis();
+
+//                try {
+//                    sleep(10000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+
+                AndroidPhotoScanner.clear();
+                AndroidPhotoScanner.startScan();
+                List<PhotoItem> photos = AndroidPhotoScanner.mDefaultFolder.getList();
+                List<ImageWithFaceList> imageWithFaceLists = null;
+                List<Face> faceListAll = new ArrayList<>();
+                if(mAllImageWithFaces.getValue() == null){
+                    imageWithFaceLists = mImageDao.getImageWithFaceListNow();
+                }
+                else {
+                    imageWithFaceLists = mAllImageWithFaces.getValue();
+                }
+
+
+//                List<Image> images = new ArrayList<>();
+//                if(mAllImages.getValue() == null) {
+//                    images = mImageDao.getImageListNow();
+//                } else{
+//                    images = mAllImages.getValue();
+//                }
+
+                List<ImageWithFaceList> newImageWithFaceLists = new ArrayList<>();
+//                List<Image> newImages = new ArrayList<>();
+//                List<Face> newFaces = new ArrayList<>();
+
+                List<ImageWithFaceList> deleteImageWithFaceLists = new ArrayList<>();
+                int i = 0;
+                int j = 0;
+
+                while(i<photos.size() && j<imageWithFaceLists.size()) {  //从后往前遍历 直到最前边的数字都遍历完
+                    if(photos.get(i).getModified() > imageWithFaceLists.get(j).image.date){    //之前的照片可能删除了导致时间
+                        ImageWithFaceList result = getNewImageAndFaces(photos.get(i));
+
+                        newImageWithFaceLists.add(result);
+                        faceListAll.addAll(result.faceList);
+//                        newImages.add(newImage);
+//                        newFaces.addAll(newFace);
+                        i++;
+                    }
+                    else if(photos.get(i).getModified() == imageWithFaceLists.get(j).image.date){
+                        faceListAll.addAll(imageWithFaceLists.get(j).faceList);
+                        i++;
+                        j++;
+                    }
+                    else{
+                        deleteImageWithFaceLists.add(imageWithFaceLists.get(j));
+//                        deleteImages.add(imageWithFaceLists.get(j).image);
+//                        deleteFaces.addAll(imageWithFaceLists.get(j).faceList);
+                        j++;
+                    }
+                }
+                while(i<photos.size()){
+                    ImageWithFaceList result = getNewImageAndFaces(photos.get(i));
+
+                    newImageWithFaceLists.add(result);
+                    faceListAll.addAll(result.faceList);
+                    i++;
+                }
+                while(j<imageWithFaceLists.size()){
+                    deleteImageWithFaceLists.add(imageWithFaceLists.get(j));
+                    j++;
+                }
+
+
+                long endTime1 = System.currentTimeMillis();
+                System.out.println("扫描运行时间为:" + (endTime1 - startTime)+"毫秒");
+
+                new FaceCluster(0.75f,2,faceListAll);
+                System.out.println("faceListAllLength:"+faceListAll.size());
+                System.out.println("      "+GsonInstance.getInstance().getGson().toJson(FaceCluster.cid));
+                for(int k = 0;k<faceListAll.size();k++){
+                    faceListAll.get(k).faceClusterType = FaceCluster.cid[k];
+                }
+                long endTime2 = System.currentTimeMillis();
+                System.out.println("faceCluster扫描运行时间为:" + (endTime2 - endTime1)+"毫秒");
+
+
+                insertImageWithFaceList(newImageWithFaceLists);
+                deleteImageWithFaceList(deleteImageWithFaceLists);
+
+                System.out.println("newImageWithFaceListScan:"+newImageWithFaceLists.size());
+                for(ImageWithFaceList newImageWithFace:newImageWithFaceLists)
+                {
+                    newImageWithFace.printInfo();
+                }
+
+                System.out.println("deleteImageWithFaceListScan:"+deleteImageWithFaceLists.size());
+                for(ImageWithFaceList deleteImageWithFace:deleteImageWithFaceLists)
+                {
+                    deleteImageWithFace.printInfo();
+                }
+                HomeFragment.scanButtonIsAvailable = true;
+            }
+        });
+    }
 }

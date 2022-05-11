@@ -20,7 +20,7 @@ import java.util.List;
 public interface ImageDao {
     //向 DAO 类添加一个方法，用于返回将父实体与子实体配对的数据类的所有实例。该方法需要 Room 运行两次查询，因此应向该方法添加 @Transaction 注释，以确保整个操作以原子方式执行。
     @Transaction
-    @Query("SELECT * FROM image")
+    @Query("SELECT * FROM image order by date DESC")
     public LiveData<List<ImageWithFaceList>> getImageWithFaceList();
 
 //    @Transaction
@@ -33,17 +33,22 @@ public interface ImageDao {
     @Query("SELECT * FROM image order by date DESC")
     List<Image> getImageListNow();
 
+    @Transaction
+    @Query("SELECT * FROM image order by date DESC")
+    List<ImageWithFaceList> getImageWithFaceListNow();
+
 
     @Query("SELECT * FROM image WHERE path = :path")
     Image getImage(String path);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Image image);
+    long insert(Image image);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(List<Image> images);
 
-    @Delete()
+
+    @Delete
     void deleteImage(Image image);
 
     @Delete

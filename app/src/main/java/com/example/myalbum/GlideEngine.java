@@ -123,7 +123,8 @@ public class GlideEngine implements ImageEngine {
         }
         Glide.with(context)
                 .load(url)
-                .override(UIUtils.getScreenWidth()/4, UIUtils.getScreenWidth()/4)
+                .fitCenter()
+//                .override(UIUtils.getScreenWidth()/4, UIUtils.getScreenWidth()/4)
                 .centerCrop()
                 .placeholder(com.luck.picture.lib.R.drawable.ps_image_placeholder)
                 .into(imageView);

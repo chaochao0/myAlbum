@@ -65,6 +65,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -312,9 +313,10 @@ public class NotificationsFragment extends Fragment {
         }
 // Publish a new song.
         ContentValues newImageDetails = new ContentValues();
-        newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME,
-                "temp.jpg");
-
+//        newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME,
+//                "temp.jpg");
+        newImageDetails.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Camera");
+        newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME, new Date(System.currentTimeMillis()).toString()+".png");
 // Keeps a handle to the new song's URI in case we need to modify it
 // later.
 

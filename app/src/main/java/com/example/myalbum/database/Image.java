@@ -38,7 +38,7 @@ public class Image {
         System.out.println("imageId"+imageId);
         System.out.println("date:"+date);
         System.out.println("path:"+path);
-        System.out.println("imageFeatures："+GsonInstance.getInstance().getGson().toJson(imageFeatures));
+//        System.out.println("imageFeatures："+GsonInstance.getInstance().getGson().toJson(imageFeatures));
         System.out.println("classIndex:"+classIndex);
         System.out.println("faceNum:"+faceNum);
     }

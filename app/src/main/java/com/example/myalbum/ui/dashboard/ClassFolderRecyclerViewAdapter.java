@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -154,6 +155,7 @@ public class ClassFolderRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if(holder instanceof ClassFolderRecyclerViewAdapter.HeadingHolder){
+            ((ClassFolderRecyclerViewAdapter.HeadingHolder) holder).textView.setTextSize(16);
             ((ClassFolderRecyclerViewAdapter.HeadingHolder) holder).textView.setText((String)ClassFolderList.get(position));
         }
         else if(holder instanceof ClassFolderRecyclerViewAdapter.ClassFolderHolder){

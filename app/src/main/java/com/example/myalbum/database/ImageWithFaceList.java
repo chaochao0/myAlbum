@@ -12,4 +12,13 @@ public class ImageWithFaceList {
             entityColumn = "imageOwnerId"
     )
     public List<Face> faceList;
+
+    public void printInfo(){
+        image.printInfo();
+        for(int j = 0;j<image.faceNum;j++){
+            System.out.println("    face_"+j+" faceId:"+faceList.get(j).faceId);
+            System.out.println("    face_"+j+" ownerId:"+faceList.get(j).imageOwnerId);
+            System.out.println("    face_"+j+" faceClusterType:"+faceList.get(j).faceClusterType);
+        }
+    }
 }

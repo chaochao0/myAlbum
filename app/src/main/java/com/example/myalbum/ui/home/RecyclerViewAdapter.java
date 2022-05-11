@@ -111,7 +111,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public RecyclerViewAdapter(Context context, LinkedHashMap<String, List<PhotoItem>> photoWithDay){
         for(Map.Entry<String, List<PhotoItem>> entry: photoWithDay.entrySet()) {
             photoWithDayList.add(entry.getKey());
-            System.out.println(entry.getKey());
+//            System.out.println(entry.getKey());
             for(PhotoItem item:entry.getValue()){
                 photoWithDayList.add(item);
             }
@@ -135,6 +135,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if(holder instanceof DateHolder){
+//            if(position==0){
+//                ((DateHolder) holder).textView.lay
+//            }
             ((DateHolder) holder).textView.setText((String)photoWithDayList.get(position));
         }
         else if(holder instanceof PhotoHolder){

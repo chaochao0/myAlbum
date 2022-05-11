@@ -11,19 +11,21 @@
         android:layout_height="76dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        app:civ_border_color="#FF000000"
+        app:civ_border_width="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars"
-        app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp" />
+        tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/face_num_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:gravity="center"
         android:text="faceNum_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/circle_face_image" />
 </androidx.constraintlayout.widget.ConstraintLayout>

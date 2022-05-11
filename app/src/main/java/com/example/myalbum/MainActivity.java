@@ -119,10 +119,10 @@ public class MainActivity extends AppCompatActivity {
         repo.getAllFaces().observe(this, new Observer<List<Face>>() {
             @Override
             public void onChanged(List<Face> faces) {
-                Log.i("facesLength", String.valueOf(faces.size()));
-                for(Face face:faces){
-                    face.printFaceInfo();
-                }
+//                Log.i("facesLength", String.valueOf(faces.size()));
+//                for(Face face:faces){
+//                    face.printFaceInfo();
+//                }
             }
         });
 

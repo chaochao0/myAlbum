@@ -61,7 +61,6 @@ public class AndroidPhotoScanner {
         Log.i("readSystemGallery","start");
         //获取ContentResolver
         ContentResolver contentResolver = UIUtils.getContext().getContentResolver();
-        Log.i("readSystemGallery ","1");
         //查询字段
         String[] projection = new String[]{MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DATA,
@@ -156,7 +155,6 @@ public class AndroidPhotoScanner {
         if (mCursor != null) {
             mCursor.close();
         }
-        Log.i("readSystemGallery ","4");
     }
 
     /** 获取照片缩略图 */

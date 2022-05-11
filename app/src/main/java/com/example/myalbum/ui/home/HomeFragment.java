@@ -2,6 +2,8 @@ package com.example.myalbum.ui.home;
 
 import static androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +44,7 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private static HomeViewModel homeViewModel = null;
+    static public boolean scanButtonIsAvailable = true;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -82,18 +85,22 @@ public class HomeFragment extends Fragment {
             public void onChanged(List<Image> images) {
                 System.out.println("homeViewModelGetImageListOnChanged"+": images length"+images.size());
                 LinkedHashMap<String, List<PhotoItem>> mSectionsOfDay = new LinkedHashMap<>();
-                images.get(images.size()-1).printInfo();
-//                Date date = new Date(images.get(images.size()-1).getModified() * 1000);
-//                String detail = AndroidPhotoScanner.mDataFormatOfDay.format(date);
-//                String week = DateUtil.getWeek(date);
-//                String dayKey = detail + week;
-                int i =0;
-                for(Image image:images){
-                    i++;
-                    if(i>5)
-                        break;
-                        image.printInfo();
-                }
+                images.get(0).printInfo();
+////                Date date = new Date(images.get(images.size()-1).getModified() * 1000);
+////                String detail = AndroidPhotoScanner.mDataFormatOfDay.format(date);
+////                String week = DateUtil.getWeek(date);
+////                String dayKey = detail + week;
+//                int i =0;
+//                for(Image image:images) {
+//                    for (Image image2 : images) {
+//                        if (image.date == image2.date && image.imageId != image2.imageId) {
+//                            image.printInfo();
+//                            image2.printInfo();
+//                        }
+////                    System.out.println("date: "+image.date);
+////                        image.printInfo();
+//                    }
+//                }
                 for(Image image:images){
                     PhotoItem photo = new PhotoItem(image.path,image.date);
 
@@ -145,12 +152,29 @@ public class HomeFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case R.id.action_cart://监听菜单按钮
-                System.out.println("扫描点击事件");
+        if(scanButtonIsAvailable)
+        {
+            switch (item.getItemId()) {
+                case R.id.action_cart://监听菜单按钮
+                    System.out.println("扫描点击事件");
+                    new AlertDialog.Builder(getContext()).setTitle("提示")//设置对话框标题
+                            .setMessage("扫描照片更新数据库需要一定时间，是否确定扫描")
+                            .setPositiveButton("是", new DialogInterface.OnClickListener() {//添加确定按钮
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {//确定按钮的响应事件，点击事件没写，自己添加
+                                    ImageRepository.getImageRepositoryInstance().restartScanPhoto();
+                                    scanButtonIsAvailable = false;
+                                }
+                            }).setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                break;
+                        }
+                    }).show();//在按键响应事件中显示此对话框
+                    break;
+            }
         }
+
         return super.onOptionsItemSelected(item);
     }
 

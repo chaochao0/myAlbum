@@ -75,7 +75,7 @@ public class FaceFragment extends Fragment {
                     }
                 }
                 System.out.println("faceViewModelGetAllImageWithFaces"+": faceNum length"+faceNum);
-
+                imageWithFaceLists.get(0).faceList.get(0).printFaceInfo();
                 RecyclerView recyclerView = binding.rvFace;
 
                 RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 4);
@@ -96,7 +96,6 @@ public class FaceFragment extends Fragment {
                 }
                 if(images.size()==0){
                     new AlertDialog.Builder(getContext()).setTitle("提示")//设置对话框标题
-
                             .setMessage("所选照片没有检测到人脸，请更换一张新的照片")
                             .setPositiveButton("是", new DialogInterface.OnClickListener() {//添加确定按钮
 
